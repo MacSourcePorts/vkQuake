@@ -152,9 +152,9 @@ ifneq ($(HOST_OS),darwin)
 COMMON_LIBS+= -lvulkan
 CFLAGS+= -DLINUX
 else
-ifeq ($(shell test -d /opt/homebrew && echo true),true)
-COMMON_LIBS+= -L/opt/homebrew/lib
-CFLAGS+= -I/opt/homebrew/include
+ifeq ($(shell test -d /Users/tomkidd/Documents/GitHub/MSPStore && echo true),true)
+COMMON_LIBS+= -L/Users/tomkidd/Documents/GitHub/MSPStore/lib
+CFLAGS+= -I/Users/tomkidd/Documents/GitHub/MSPStore/include
 endif
 COMMON_LIBS+= -lMoltenVK
 endif
@@ -174,9 +174,9 @@ DEFAULT_TARGET := vkquake
 # ---------------------------
 
 %.o:	%.c
-	$(CC) $(DFLAGS) -c $(CFLAGS) $(SDL_CFLAGS) -o $@ $<
+	$(CC) -arch $(ARCH) $(DFLAGS) -c $(CFLAGS) $(SDL_CFLAGS) -o $@ $<
 %.o:	../Shaders/Compiled/%.c
-	$(CC) $(DFLAGS) -c $(CFLAGS) $(SDL_CFLAGS) -o $@ $^
+	$(CC) -arch $(ARCH) $(DFLAGS) -c $(CFLAGS) $(SDL_CFLAGS) -o $@ $^
 
 # ----------------------------------------------------------------------------
 # objects
@@ -301,7 +301,7 @@ OBJS := strlcat.o \
 # ------------------------
 
 vkquake:	$(OBJS)
-	$(LINKER) $(OBJS) $(LDFLAGS) $(LIBS) $(SDL_LIBS) -o $@
+	$(LINKER) -arch $(ARCH) $(OBJS) $(LDFLAGS) $(LIBS) $(SDL_LIBS) -o $@
 	$(call do_strip,$@)
 
 image.o: lodepng.c lodepng.h stb_image_write.h

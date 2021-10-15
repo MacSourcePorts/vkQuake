@@ -25,3 +25,4 @@ AppImage/vkquake*.AppImage
 .DS_Store
 build/
 CMakeLists.txt
+Quake/build_macosx_values.sh
