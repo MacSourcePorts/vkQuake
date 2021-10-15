@@ -20,10 +20,20 @@ EXECUTABLE_NAME="vkquake"
 BUILT_PRODUCTS_DIR="build"
 PKGINFO="APPLVKQ1"
 
+# For parallel make on multicore boxes...
+NCPU=`sysctl -n hw.ncpu`
+
 # make the thing
 rm -rf "${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}"
+if [ ! -d "x86_64" ]; then
+	mkdir -p "x86_64" || exit 1;
+fi
+if [ ! -d "arm64" ]; then
+	mkdir -p "arm64" || exit 1;
+fi
 make clean
-(ARCH=x86_64 make) || exit 1;
+(ARCH=x86_64 make -j$NCPU) || exit 1;
+(ARCH=arm64 make -j$NCPU) || exit 1;
 # ARCH=arm64
 # make
 
@@ -39,7 +49,8 @@ if [ ! -d "${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}" ]; then
 fi
 
 # copy and generate some application bundle resources
-cp vkquake "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
+#cp vkquake "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
+lipo x86_64/vkquake arm64/vkquake -output "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}/vkquake" -create
 
 cp /Users/tomkidd/Documents/GitHub/MSPStore/Cellar/sdl2/2.0.16/lib/libSDL2-2.0.0.dylib "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
 cp /Users/tomkidd/Documents/GitHub/MSPStore/Cellar/molten-vk/1.1.5/lib/libMoltenVK.dylib "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
