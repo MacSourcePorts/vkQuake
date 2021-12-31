@@ -1,33 +1,46 @@
-#!/bin/bash
-VKQ1_VERSION="1.11.0"
+# game/app specific values
+export APP_VERSION="1.11.0"
+export ICONSDIR="Misc"
+export ICONSFILENAME="quake.icns"
+export PRODUCT_NAME="vkQuake"
+export EXECUTABLE_NAME="vkquake"
+export PKGINFO="APPLVKQ1"
+export COPYRIGHT_TEXT="Return to Castle Wolfenstein Copyright © 1999-2000 id Software, Inc. All rights reserved."
+
+# constants
+export BUILT_PRODUCTS_DIR="release"
+export WRAPPER_NAME="${PRODUCT_NAME}.app"
+export CONTENTS_FOLDER_PATH="${WRAPPER_NAME}/Contents"
+export EXECUTABLE_FOLDER_PATH="${CONTENTS_FOLDER_PATH}/MacOS"
+export UNLOCALIZED_RESOURCES_FOLDER_PATH="${CONTENTS_FOLDER_PATH}/Resources"
+export ICONS="${ICONSFILENAME}.icns"
+export BUNDLE_ID="com.macsourceports.${PRODUCT_NAME}"
 
 CURRENT_ARCH=$(uname -m)
 echo "CURRENT_ARCH: $CURRENT_ARCH"
-
-ICNSDIR="../Misc"
-ICNS="quake.icns"
-PRODUCT_NAME="vkQuake"
-WRAPPER_EXTENSION="app"
-WRAPPER_NAME="${PRODUCT_NAME}.${WRAPPER_EXTENSION}"
-CONTENTS_FOLDER_PATH="${WRAPPER_NAME}/Contents"
-UNLOCALIZED_RESOURCES_FOLDER_PATH="${CONTENTS_FOLDER_PATH}/Resources"
-EXECUTABLE_FOLDER_PATH="${CONTENTS_FOLDER_PATH}/MacOS"
-EXECUTABLE_NAME="vkquake"
-
-BUILT_PRODUCTS_DIR="build"
-PKGINFO="APPLVKQ1"
 
 # For parallel make on multicore boxes...
 NCPU=`sysctl -n hw.ncpu`
 
 # make the thing
-rm -rf "${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}"
-if [ ! -d "x86_64" ]; then
-	mkdir -p "x86_64" || exit 1;
-fi
-if [ ! -d "arm64" ]; then
-	mkdir -p "arm64" || exit 1;
-fi
+
+# giving up custom build dirs for now
+
+# if [ -d build ]; then
+# rm -rf build
+# fi
+# mkdir build
+# cd build
+
+# rm -rf "${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}"
+# if [ ! -d "x86_64" ]; then
+# 	mkdir -p "x86_64" || exit 1;
+# fi
+# if [ ! -d "arm64" ]; then
+# 	mkdir -p "arm64" || exit 1;
+# fi
+
+cd ../Quake
 make clean
 (ARCH=x86_64 make -j$NCPU) || exit 1;
 (ARCH=arm64 make -j$NCPU) || exit 1;
@@ -36,6 +49,7 @@ make clean
 echo "Creating bundle '${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}'"
 
 # make the application bundle directories
+cd ..
 if [ ! -d "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}" ]; then
 	mkdir -p "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}" || exit 1;
 fi
@@ -44,16 +58,18 @@ if [ ! -d "${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}" ]; then
 fi
 
 # copy and generate some application bundle resources
-lipo x86_64/vkquake arm64/vkquake -output "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}/vkquake" -create
+echo lipo Quake/x86_64/vkquake Quake/arm64/vkquake -output "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}/vkquake" -create
+lipo Quake/x86_64/vkquake Quake/arm64/vkquake -output "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}/vkquake" -create
 
-cp /Users/tomkidd/Documents/GitHub/MSPStore/lib/libSDL2-2.0.0.dylib "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
-cp /Users/tomkidd/Documents/GitHub/MSPStore/Cellar/molten-vk/1.1.5/lib/libMoltenVK.dylib "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
-cp /Users/tomkidd/Documents/GitHub/MSPStore/Cellar/libvorbis/1.3.7/lib/libvorbisfile.3.dylib "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
-cp /Users/tomkidd/Documents/GitHub/MSPStore/Cellar/libvorbis/1.3.7/lib/libvorbis.0.dylib "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
-cp /Users/tomkidd/Documents/GitHub/MSPStore/Cellar/libogg/1.3.5/lib/libogg.0.dylib "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
-cp /Users/tomkidd/Documents/GitHub/MSPStore/Cellar/mad/0.15.1b/lib/libmad.0.dylib "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
+cp ~/Documents/GitHub/MSPStore/lib/libSDL2-2.0.0.dylib "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
+cp ~/Documents/GitHub/MSPStore/lib/libMoltenVK.dylib "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
+cp ~/Documents/GitHub/MSPStore/lib/libvorbisfile.3.dylib "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
+cp ~/Documents/GitHub/MSPStore/lib/libvorbis.0.dylib "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
+cp ~/Documents/GitHub/MSPStore/lib/libogg.0.dylib "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
+cp ~/Documents/GitHub/MSPStore/lib/libmad.0.dylib "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
 
-cp ${ICNSDIR}/${ICNS} "${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/$ICNS" || exit 1;
+echo cp ${ICONSDIR}/${ICONSFILENAME} "${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/" || exit 1;
+cp ${ICONSDIR}/${ICONSFILENAME} "${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/" || exit 1;
 echo -n ${PKGINFO} > "${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/PkgInfo" || exit 1;
 
 # use install_name tool to point executable to bundled resources (probably wrong long term way to do it)
@@ -107,11 +123,11 @@ PLIST="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>${VKQ1_VERSION}</string>
+    <string>${APP_VERSION}</string>
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>CFBundleVersion</key>
-    <string>${VKQ1_VERSION}</string>
+    <string>${APP_VERSION}</string>
     <key>CGDisableCoalescedUpdates</key>
     <true/>
     <key>LSMinimumSystemVersion</key>
@@ -134,99 +150,8 @@ PLIST="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 </dict>
 </plist>
 "
-echo -e "${PLIST}" > "${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/Info.plist"
+echo "${PLIST}" > "${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/Info.plist"
 
 echo "bundle done."
 
-# user-specific values
-# specify the actual values in a separate file called build_macosx_values.sh
-
-# ****************************************************************************************
-# identity as specified in Keychain
-SIGNING_IDENTITY="Developer ID Application: Your Name (XXXXXXXXX)"
-
-ASC_USERNAME="your@apple.id"
-
-# signing password is app-specific (https://appleid.apple.com/account/manage) and stored in Keychain (as "notarize-app" in this case)
-ASC_PASSWORD="@keychain:notarize-app"
-
-# ProviderShortname can be found with
-# xcrun altool --list-providers -u your@apple.id -p "@keychain:notarize-app"
-ASC_PROVIDER="XXXXXXXXX"
-# ****************************************************************************************
-
-source build_macosx_values.sh
-
-# release build location
-RELEASE_LOCATION="build/release-darwin-universal2"
-
-# release build name
-RELEASE_BUILD="ioquake3.app"
-
-# Pre-notarized zip file (not what is shipped)
-PRE_NOTARIZED_ZIP="vkquake_prenotarized.zip"
-
-# Post-notarized zip file (shipped)
-POST_NOTARIZED_ZIP="vkquake_notarized.zip"
-
-BUNDLE_ID="com.macsourceports.vkquake3"
-
-# sign the resulting app bundle
-echo "signing..."
-codesign --force --options runtime --deep --sign "${SIGNING_IDENTITY}" ${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}
-
-if [ "$1" == "notarize" ]; then
-
-    cd ${BUILT_PRODUCTS_DIR}
-
-	# notarize app
-	# script taken from https://github.com/rednoah/notarize-app
-
-	# create the zip to send to the notarization service
-	echo "zipping..."
-	ditto -c -k --sequesterRsrc --keepParent ${WRAPPER_NAME} ${PRE_NOTARIZED_ZIP}
-
-	# create temporary files
-	NOTARIZE_APP_LOG=$(mktemp -t notarize-app)
-	NOTARIZE_INFO_LOG=$(mktemp -t notarize-info)
-
-	# delete temporary files on exit
-	function finish {
-		rm "$NOTARIZE_APP_LOG" "$NOTARIZE_INFO_LOG"
-	}
-	trap finish EXIT
-
-	echo "submitting..."
-	# submit app for notarization
-	if xcrun altool --notarize-app --primary-bundle-id "$BUNDLE_ID" --asc-provider "$ASC_PROVIDER" --username "$ASC_USERNAME" --password "$ASC_PASSWORD" -f "$PRE_NOTARIZED_ZIP" > "$NOTARIZE_APP_LOG" 2>&1; then
-		cat "$NOTARIZE_APP_LOG"
-		RequestUUID=$(awk -F ' = ' '/RequestUUID/ {print $2}' "$NOTARIZE_APP_LOG")
-
-		# check status periodically
-		while sleep 60 && date; do
-			# check notarization status
-			if xcrun altool --notarization-info "$RequestUUID" --asc-provider "$ASC_PROVIDER" --username "$ASC_USERNAME" --password "$ASC_PASSWORD" > "$NOTARIZE_INFO_LOG" 2>&1; then
-				cat "$NOTARIZE_INFO_LOG"
-
-				# once notarization is complete, run stapler and exit
-				if ! grep -q "Status: in progress" "$NOTARIZE_INFO_LOG"; then
-					xcrun stapler staple "$WRAPPER_NAME"
-					break
-				fi
-			else
-				cat "$NOTARIZE_INFO_LOG" 1>&2
-				exit 1
-			fi
-		done
-	else
-		cat "$NOTARIZE_APP_LOG" 1>&2
-		exit 1
-	fi
-
-	echo "notarized"
-	echo "zipping notarized..."
-
-	ditto -c -k --sequesterRsrc --keepParent ${WRAPPER_NAME} ${POST_NOTARIZED_ZIP}
-
-	echo "done. ${POST_NOTARIZED_ZIP} contains notarized ${WRAPPER_NAME} build."
-fi
+"../MSPScripts/sign_and_notarize.sh" "$1"
