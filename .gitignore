@@ -30,3 +30,4 @@ build/
 CMakeLists.txt
 history.txt
 Quake/build_macosx_values.sh
+release
