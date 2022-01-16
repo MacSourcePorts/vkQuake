@@ -47,7 +47,8 @@ STRIP ?= strip
 
 CPUFLAGS=
 DFLAGS ?=
-CFLAGS ?= -Wall -Wno-trigraphs -std=gnu99
+CFLAGS ?=
+CFLAGS += -Wall -Wno-trigraphs -Wno-unused-function -Werror -std=gnu11
 CFLAGS += $(CPUFLAGS)
 ifneq ($(DEBUG),0)
 DFLAGS += -D_DEBUG
@@ -55,7 +56,7 @@ CFLAGS += -g
 do_strip=
 else
 DFLAGS += -DNDEBUG
-CFLAGS += -O2
+CFLAGS += -O3
 CFLAGS += $(call check_gcc,-fweb,)
 CFLAGS += $(call check_gcc,-frename-registers,)
 cmd_strip=$(STRIP) $(1)
@@ -175,8 +176,13 @@ DEFAULT_TARGET := vkquake
 
 $(ARCH)/%.o:	%.c
 	$(CC) -arch $(ARCH) $(DFLAGS) -c $(CFLAGS) $(SDL_CFLAGS) -o $@ $<
-$(ARCH)/%.o:	../Shaders/Compiled/%.c
+ifeq ($(DEBUG),0)
+$(ARCH)%.o:	../Shaders/Compiled/Release/%.c
 	$(CC) -arch $(ARCH) $(DFLAGS) -c $(CFLAGS) $(SDL_CFLAGS) -o $@ $^
+else
+$(ARCH)%.o:	../Shaders/Compiled/Debug/%.c
+	$(CC) -arch $(ARCH) $(DFLAGS) -c $(CFLAGS) $(SDL_CFLAGS) -o $@ $^
+endif
 
 # ----------------------------------------------------------------------------
 # objects
@@ -204,29 +210,30 @@ SYSOBJ_MAIN:= $(ARCH)/main_sdl.o
 SYSOBJ_RES :=
 
 SHADER_OBJS = \
-	$(ARCH)/alias_frag.o \
-	$(ARCH)/alias_alphatest_frag.o \
-	$(ARCH)/alias_vert.o \
-	$(ARCH)/basic_alphatest_frag.o \
-	$(ARCH)/screen_effects_8bit_comp.o \
-	$(ARCH)/screen_effects_8bit_scale_comp.o \
-	$(ARCH)/screen_effects_8bit_scale_sops_comp.o \
-	$(ARCH)/screen_effects_10bit_comp.o \
-	$(ARCH)/screen_effects_10bit_scale_comp.o \
-	$(ARCH)/screen_effects_10bit_scale_sops_comp.o \
-	$(ARCH)/cs_tex_warp_comp.o \
-	$(ARCH)/basic_frag.o \
-	$(ARCH)/basic_notex_frag.o \
-	$(ARCH)/basic_vert.o \
-	$(ARCH)/sky_layer_frag.o \
-	$(ARCH)/sky_layer_vert.o \
-	$(ARCH)/sky_box_frag.o \
-	$(ARCH)/postprocess_frag.o \
-	$(ARCH)/postprocess_vert.o \
-	$(ARCH)/world_frag.o \
-	$(ARCH)/world_vert.o \
-	$(ARCH)/showtris_frag.o \
-	$(ARCH)/showtris_vert.o
+	$(ARCH)/alias.frag.o \
+	$(ARCH)/alias_alphatest.frag.o \
+	$(ARCH)/alias.vert.o \
+	$(ARCH)/basic_alphatest.frag.o \
+	$(ARCH)/screen_effects_8bit.comp.o \
+	$(ARCH)/screen_effects_8bit_scale.comp.o \
+	$(ARCH)/screen_effects_8bit_scale_sops.comp.o \
+	$(ARCH)/screen_effects_10bit.comp.o \
+	$(ARCH)/screen_effects_10bit_scale.comp.o \
+	$(ARCH)/screen_effects_10bit_scale_sops.comp.o \
+	$(ARCH)/cs_tex_warp.comp.o \
+	$(ARCH)/basic.frag.o \
+	$(ARCH)/basic_notex.frag.o \
+	$(ARCH)/basic.vert.o \
+	$(ARCH)/sky_layer.frag.o \
+	$(ARCH)/sky_layer.vert.o \
+	$(ARCH)/sky_box.frag.o \
+	$(ARCH)/postprocess.frag.o \
+	$(ARCH)/postprocess.vert.o \
+	$(ARCH)/world.frag.o \
+	$(ARCH)/world.vert.o \
+	$(ARCH)/showtris.frag.o \
+	$(ARCH)/showtris.vert.o \
+	$(ARCH)/update_lightmap.comp.o
 
 GLOBJS = \
 	$(SHADER_OBJS) \
@@ -236,6 +243,7 @@ GLOBJS = \
 	$(ARCH)/gl_fog.o \
 	$(ARCH)/gl_rmisc.o \
 	$(ARCH)/r_part.o \
+	$(ARCH)/r_part_fte.o \
 	$(ARCH)/r_world.o \
 	$(ARCH)/gl_screen.o \
 	$(ARCH)/gl_sky.o \
