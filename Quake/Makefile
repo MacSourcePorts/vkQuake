@@ -153,9 +153,13 @@ ifneq ($(HOST_OS),darwin)
 COMMON_LIBS+= -lvulkan
 CFLAGS+= -DLINUX
 else
-ifeq ($(shell test -d /Users/tomkidd/Documents/GitHub/MSPStore && echo true),true)
-COMMON_LIBS+= -L/Users/tomkidd/Documents/GitHub/MSPStore/lib
-CFLAGS+= -I/Users/tomkidd/Documents/GitHub/MSPStore/include
+LDFLAGS+= -mmacosx-version-min=10.7
+ifeq ($(ARCH),arm64)
+COMMON_LIBS+= -L/opt/homebrew/lib
+CFLAGS+= -I/opt/homebrew/include
+else
+COMMON_LIBS+= -L/usr/local/lib
+CFLAGS+= -I/usr/local/include
 endif
 COMMON_LIBS+= -lMoltenVK
 endif
@@ -177,10 +181,10 @@ DEFAULT_TARGET := vkquake
 $(ARCH)/%.o:	%.c
 	$(CC) -arch $(ARCH) $(DFLAGS) -c $(CFLAGS) $(SDL_CFLAGS) -o $@ $<
 ifeq ($(DEBUG),0)
-$(ARCH)%.o:	../Shaders/Compiled/Release/%.c
+$(ARCH)/%.o:	../Shaders/Compiled/Release/%.c
 	$(CC) -arch $(ARCH) $(DFLAGS) -c $(CFLAGS) $(SDL_CFLAGS) -o $@ $^
 else
-$(ARCH)%.o:	../Shaders/Compiled/Debug/%.c
+$(ARCH)/%.o:	../Shaders/Compiled/Debug/%.c
 	$(CC) -arch $(ARCH) $(DFLAGS) -c $(CFLAGS) $(SDL_CFLAGS) -o $@ $^
 endif
 
