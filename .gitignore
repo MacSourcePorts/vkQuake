@@ -29,3 +29,6 @@ CMakeLists.txt
 history.txt
 Quake/build_macosx_values.sh
 release
+*.o
+build-arm64
+build-x86_64

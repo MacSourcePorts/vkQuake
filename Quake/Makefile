@@ -178,13 +178,13 @@ DEFAULT_TARGET := vkquake
 # rules
 # ---------------------------
 
-$(ARCH)/%.o:	%.c
+%.o:	%.c
 	$(CC) -arch $(ARCH) $(DFLAGS) -c $(CFLAGS) $(SDL_CFLAGS) -o $@ $<
 ifeq ($(DEBUG),0)
-$(ARCH)/%.o:	../Shaders/Compiled/Release/%.c
+%.o:	../Shaders/Compiled/Release/%.c
 	$(CC) -arch $(ARCH) $(DFLAGS) -c $(CFLAGS) $(SDL_CFLAGS) -o $@ $^
 else
-$(ARCH)/%.o:	../Shaders/Compiled/Debug/%.c
+%.o:	../Shaders/Compiled/Debug/%.c
 	$(CC) -arch $(ARCH) $(DFLAGS) -c $(CFLAGS) $(SDL_CFLAGS) -o $@ $^
 endif
 
@@ -192,120 +192,120 @@ endif
 # objects
 # ----------------------------------------------------------------------------
 
-MUSIC_OBJS:= $(ARCH)/bgmusic.o \
-	$(ARCH)/snd_codec.o \
-	$(ARCH)/snd_flac.o \
-	$(ARCH)/snd_wave.o \
-	$(ARCH)/snd_vorbis.o \
-	$(ARCH)/snd_opus.o \
-	$(ARCH)/$(mp3_obj).o \
-	$(ARCH)/snd_mp3tag.o \
-	$(ARCH)/snd_mikmod.o \
-	$(ARCH)/snd_xmp.o \
-	$(ARCH)/snd_umx.o
-COMOBJ_SND := $(ARCH)/snd_dma.o $(ARCH)/snd_mix.o $(ARCH)/snd_mem.o $(MUSIC_OBJS)
-SYSOBJ_SND := $(ARCH)/snd_sdl.o
-SYSOBJ_CDA := $(ARCH)/cd_sdl.o
-SYSOBJ_INPUT := $(ARCH)/in_sdl.o
-SYSOBJ_GL_VID:= $(ARCH)/gl_vidsdl.o
-SYSOBJ_NET := $(ARCH)/net_bsd.o $(ARCH)/net_udp.o
-SYSOBJ_SYS := $(ARCH)/pl_linux.o $(ARCH)/sys_sdl_unix.o
-SYSOBJ_MAIN:= $(ARCH)/main_sdl.o
+MUSIC_OBJS:= bgmusic.o \
+	snd_codec.o \
+	snd_flac.o \
+	snd_wave.o \
+	snd_vorbis.o \
+	snd_opus.o \
+	$(mp3_obj).o \
+	snd_mp3tag.o \
+	snd_mikmod.o \
+	snd_xmp.o \
+	snd_umx.o
+COMOBJ_SND := snd_dma.o snd_mix.o snd_mem.o $(MUSIC_OBJS)
+SYSOBJ_SND := snd_sdl.o
+SYSOBJ_CDA := cd_sdl.o
+SYSOBJ_INPUT := in_sdl.o
+SYSOBJ_GL_VID:= gl_vidsdl.o
+SYSOBJ_NET := net_bsd.o net_udp.o
+SYSOBJ_SYS := pl_linux.o sys_sdl_unix.o
+SYSOBJ_MAIN:= main_sdl.o
 SYSOBJ_RES :=
 
 SHADER_OBJS = \
-	$(ARCH)/alias.frag.o \
-	$(ARCH)/alias_alphatest.frag.o \
-	$(ARCH)/alias.vert.o \
-	$(ARCH)/basic_alphatest.frag.o \
-	$(ARCH)/screen_effects_8bit.comp.o \
-	$(ARCH)/screen_effects_8bit_scale.comp.o \
-	$(ARCH)/screen_effects_8bit_scale_sops.comp.o \
-	$(ARCH)/screen_effects_10bit.comp.o \
-	$(ARCH)/screen_effects_10bit_scale.comp.o \
-	$(ARCH)/screen_effects_10bit_scale_sops.comp.o \
-	$(ARCH)/cs_tex_warp.comp.o \
-	$(ARCH)/basic.frag.o \
-	$(ARCH)/basic_notex.frag.o \
-	$(ARCH)/basic.vert.o \
-	$(ARCH)/sky_layer.frag.o \
-	$(ARCH)/sky_layer.vert.o \
-	$(ARCH)/sky_box.frag.o \
-	$(ARCH)/postprocess.frag.o \
-	$(ARCH)/postprocess.vert.o \
-	$(ARCH)/world.frag.o \
-	$(ARCH)/world.vert.o \
-	$(ARCH)/showtris.frag.o \
-	$(ARCH)/showtris.vert.o \
-	$(ARCH)/update_lightmap.comp.o
+	alias.frag.o \
+	alias_alphatest.frag.o \
+	alias.vert.o \
+	basic_alphatest.frag.o \
+	screen_effects_8bit.comp.o \
+	screen_effects_8bit_scale.comp.o \
+	screen_effects_8bit_scale_sops.comp.o \
+	screen_effects_10bit.comp.o \
+	screen_effects_10bit_scale.comp.o \
+	screen_effects_10bit_scale_sops.comp.o \
+	cs_tex_warp.comp.o \
+	basic.frag.o \
+	basic_notex.frag.o \
+	basic.vert.o \
+	sky_layer.frag.o \
+	sky_layer.vert.o \
+	sky_box.frag.o \
+	postprocess.frag.o \
+	postprocess.vert.o \
+	world.frag.o \
+	world.vert.o \
+	showtris.frag.o \
+	showtris.vert.o \
+	update_lightmap.comp.o
 
 GLOBJS = \
 	$(SHADER_OBJS) \
-	$(ARCH)/gl_refrag.o \
-	$(ARCH)/gl_rlight.o \
-	$(ARCH)/gl_rmain.o \
-	$(ARCH)/gl_fog.o \
-	$(ARCH)/gl_rmisc.o \
-	$(ARCH)/r_part.o \
-	$(ARCH)/r_part_fte.o \
-	$(ARCH)/r_world.o \
-	$(ARCH)/gl_screen.o \
-	$(ARCH)/gl_sky.o \
-	$(ARCH)/gl_warp.o \
+	gl_refrag.o \
+	gl_rlight.o \
+	gl_rmain.o \
+	gl_fog.o \
+	gl_rmisc.o \
+	r_part.o \
+	r_part_fte.o \
+	r_world.o \
+	gl_screen.o \
+	gl_sky.o \
+	gl_warp.o \
 	$(SYSOBJ_GL_VID) \
-	$(ARCH)/gl_draw.o \
-	$(ARCH)/image.o \
-	$(ARCH)/gl_texmgr.o \
-	$(ARCH)/gl_mesh.o \
-	$(ARCH)/gl_heap.o \
-	$(ARCH)/r_sprite.o \
-	$(ARCH)/r_alias.o \
-	$(ARCH)/r_brush.o \
-	$(ARCH)/gl_model.o
+	gl_draw.o \
+	image.o \
+	gl_texmgr.o \
+	gl_mesh.o \
+	gl_heap.o \
+	r_sprite.o \
+	r_alias.o \
+	r_brush.o \
+	gl_model.o
 
-OBJS := $(ARCH)/strlcat.o \
-	$(ARCH)/strlcpy.o \
+OBJS := strlcat.o \
+	strlcpy.o \
 	$(GLOBJS) \
 	$(SYSOBJ_INPUT) \
 	$(COMOBJ_SND) \
 	$(SYSOBJ_SND) \
 	$(SYSOBJ_CDA) \
 	$(SYSOBJ_NET) \
-	$(ARCH)/net_dgrm.o \
-	$(ARCH)/net_loop.o \
-	$(ARCH)/net_main.o \
-	$(ARCH)/chase.o \
-	$(ARCH)/cl_demo.o \
-	$(ARCH)/cl_input.o \
-	$(ARCH)/cl_main.o \
-	$(ARCH)/cl_parse.o \
-	$(ARCH)/cl_tent.o \
-	$(ARCH)/console.o \
-	$(ARCH)/keys.o \
-	$(ARCH)/menu.o \
-	$(ARCH)/sbar.o \
-	$(ARCH)/view.o \
-	$(ARCH)/wad.o \
-	$(ARCH)/cmd.o \
-	$(ARCH)/common.o \
-	$(ARCH)/miniz.o \
-	$(ARCH)/crc.o \
-	$(ARCH)/cvar.o \
-	$(ARCH)/cfgfile.o \
-	$(ARCH)/host.o \
-	$(ARCH)/host_cmd.o \
-	$(ARCH)/mathlib.o \
-	$(ARCH)/mdfour.o \
-	$(ARCH)/pr_cmds.o \
-	$(ARCH)/pr_ext.o \
-	$(ARCH)/pr_edict.o \
-	$(ARCH)/pr_exec.o \
-	$(ARCH)/sv_main.o \
-	$(ARCH)/sv_move.o \
-	$(ARCH)/sv_phys.o \
-	$(ARCH)/sv_user.o \
-	$(ARCH)/world.o \
-	$(ARCH)/zone.o \
+	net_dgrm.o \
+	net_loop.o \
+	net_main.o \
+	chase.o \
+	cl_demo.o \
+	cl_input.o \
+	cl_main.o \
+	cl_parse.o \
+	cl_tent.o \
+	console.o \
+	keys.o \
+	menu.o \
+	sbar.o \
+	view.o \
+	wad.o \
+	cmd.o \
+	common.o \
+	miniz.o \
+	crc.o \
+	cvar.o \
+	cfgfile.o \
+	host.o \
+	host_cmd.o \
+	mathlib.o \
+	mdfour.o \
+	pr_cmds.o \
+	pr_ext.o \
+	pr_edict.o \
+	pr_exec.o \
+	sv_main.o \
+	sv_move.o \
+	sv_phys.o \
+	sv_user.o \
+	world.o \
+	zone.o \
 	$(SYSOBJ_SYS) $(SYSOBJ_MAIN) $(SYSOBJ_RES)
 
 # ------------------------
@@ -313,8 +313,8 @@ OBJS := $(ARCH)/strlcat.o \
 # ------------------------
 
 vkquake:	$(OBJS)
-	$(LINKER) -arch $(ARCH) $(OBJS) $(LDFLAGS) $(LIBS) $(SDL_LIBS) -o $(ARCH)/$@
-	$(call do_strip,$(ARCH)/$@)
+	$(LINKER) -arch $(ARCH) $(OBJS) $(LDFLAGS) $(LIBS) $(SDL_LIBS) -o $@
+	$(call do_strip,$@)
 
 image.o: lodepng.c lodepng.h stb_image_write.h
 
